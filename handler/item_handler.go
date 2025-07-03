@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"project-app-inventory-restapi-golang-faisal/model"
 	"project-app-inventory-restapi-golang-faisal/service"
+	"project-app-inventory-restapi-golang-faisal/utils"
 	"strconv"
 
 	"github.com/go-chi/chi"
@@ -48,7 +49,16 @@ func (h *ItemHandler) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	if err := utils.Validate.Struct(item); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": "Item berhasil ditambahkan",
+	})
 }
 
 func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +74,16 @@ func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if err := utils.Validate.Struct(item); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": "Item barhasil diperbaharui",
+	})
 }
 
 func (h *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
@@ -74,4 +93,7 @@ func (h *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": "Item berhasil dihapus",
+	})
 }

@@ -31,6 +31,8 @@ func main()  {
 	}
 	defer logger.Sync()
 
+	utils.InitValidator()
+
 	r := routes.SetUpRouter()
 
 	port := cfg.AppPort
