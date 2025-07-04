@@ -45,12 +45,13 @@ func (h *ItemHandler) Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := h.service.Create(&item); err != nil {
+	
+	if err := utils.Validate.Struct(item); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if err := utils.Validate.Struct(item); err != nil {
+	if err := h.service.Create(&item); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
