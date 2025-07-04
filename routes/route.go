@@ -26,6 +26,10 @@ func SetUpRouter() http.Handler  {
 	categoryRepo := repository.NewCategoryRepository(db)
 	categoryService := service.NewCategoryService(categoryRepo)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
+
+	warehouseRepo := repository.NewWarehouseRepository(db)
+	warehouseService := service.NewWarehouseService(warehouseRepo)
+	warehouseHandler := handler.NewWarehouseHandler(warehouseService)
 	
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
@@ -44,6 +48,13 @@ func SetUpRouter() http.Handler  {
 		r.Post("/", categoryHandler.Create)
 		r.Put("/{id}", categoryHandler.Update)
 		r.Delete("/{id}", categoryHandler.Delete)
+	})
+
+	r.Route("/warehouses", func(r chi.Router) {
+		r.Get("/", warehouseHandler.GetAll)
+		r.Post("/", warehouseHandler.Create)
+		r.Put("/{id}", warehouseHandler.Update)
+		r.Delete("/{id}", warehouseHandler.Delete)
 	})
 	return  r
 }
