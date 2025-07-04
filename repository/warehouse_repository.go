@@ -49,12 +49,12 @@ func (r *warehouseRepository) GetByID(id int64) (*model.Warehouse, error) {
 	return &w, nil
 }
 
-func (r *warehouseRepository) Create(warehouse *model.Warehouse) error {
-	_, err := r.db.Exec(`INSERT INTO warehouses(name) VALUES($1) RETURNING id`, warehouse.Name)
+func (r *warehouseRepository) Create(w *model.Warehouse) error {
+	err := r.db.QueryRow(`INSERT INTO warehouses(name) VALUES($1) RETURNING id`, w.Name).Scan(&w.ID)
 	return  err
 }
-func (r *warehouseRepository) Update(warehouse *model.Warehouse) error {
-	_, err := r.db.Exec(`UPDATE FROM warehouses SET name=$1`, warehouse.Name)
+func (r *warehouseRepository) Update(w *model.Warehouse) error {
+	_, err := r.db.Exec(`UPDATE warehouses SET name=$1 WHERE id=$2`, w.Name, w.ID)
 	return  err
 }
 func (r *warehouseRepository) Delete(id int64) error {

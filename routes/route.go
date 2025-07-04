@@ -45,6 +45,7 @@ func SetUpRouter() http.Handler  {
 
 	r.Route("/categories", func(r chi.Router) {
 		r.Get("/", categoryHandler.GetAll)
+		r.Get("/", categoryHandler.GetByID)
 		r.Post("/", categoryHandler.Create)
 		r.Put("/{id}", categoryHandler.Update)
 		r.Delete("/{id}", categoryHandler.Delete)
@@ -52,6 +53,7 @@ func SetUpRouter() http.Handler  {
 
 	r.Route("/warehouses", func(r chi.Router) {
 		r.Get("/", warehouseHandler.GetAll)
+		r.Get("/{id}", warehouseHandler.GetByID)
 		r.Post("/", warehouseHandler.Create)
 		r.Put("/{id}", warehouseHandler.Update)
 		r.Delete("/{id}", warehouseHandler.Delete)

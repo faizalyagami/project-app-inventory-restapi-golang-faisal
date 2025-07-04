@@ -43,8 +43,8 @@ func (h *WarehouseHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	if err := h.service.Update(&warehouse); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if err := h.service.Create(&warehouse); err != nil {
+		http.Error(w, err.Error(), http.StatusCreated)
 		return
 	}
 
