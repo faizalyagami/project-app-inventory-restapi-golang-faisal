@@ -41,6 +41,10 @@ func SetUpRouter() http.Handler  {
 	authService := service.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
 
+	saleRepo := repository.NewSaleRepository(db)
+	saleService := service.NewSaleServer(saleRepo)
+	saleHandler := handler.NewSaleHandler(saleService)
+
 	r.Use(middleware.LoadUser(userRepo))
 	
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
@@ -81,9 +85,16 @@ func SetUpRouter() http.Handler  {
 		r.Put("/{id}", rackHandler.Update)
 		r.Delete("/{id}", rackHandler.Delete)
 	})
+
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/login", authHandler.Login)
 		r.Post("/register", authHandler.Register)
+	})
+
+	r.Route("/sales", func(r chi.Router) {
+		r.Post("/", saleHandler.Create)
+		r.Get("/", saleHandler.GetAll)
+		r.Post("/{id}", saleHandler.GetByID)
 	})
 	return  r
 }

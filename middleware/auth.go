@@ -26,6 +26,14 @@ func GetUserFromContext(r *http.Request) *model.User {
 	return user
 }
 
+// func GetUserFromContext(ctx context.Context) *model.User {
+// 	user , ok := ctx.Value(userContextKey).(*[]model.User)
+// 	if !ok {
+// 		return nil
+// 	}
+// 	return user
+// }
+
 func RoleMiddleware(allowedRoles ...string) func (http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
