@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi"
+	"github.com/go-playground/validator/v10"
 )
 
 type WarehouseHandler struct {
@@ -37,19 +38,47 @@ func (h *WarehouseHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(warehouse)
 }
 func (h *WarehouseHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var warehouse model.Warehouse	
-	if err := json.NewDecoder(r.Body).Decode(&warehouse); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	var warehouse model.Warehouse
+
+	if r.Header.Get("Content-Type") != "application/json" {
+		http.Error(w, "Content-Type must be application/json", http.StatusUnsupportedMediaType)
 		return
 	}
 	
-	if err := h.service.Create(&warehouse); err != nil {
-		http.Error(w, err.Error(), http.StatusCreated)
+	//decode dan tolak field asing
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(&warehouse); err != nil {
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status": "error",
+			"message": "Format JSON tidak valid: " + err.Error(),
+		})
 		return
 	}
-
+	
+	//validation input
 	if err := utils.Validate.Struct(warehouse); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		var validationErrors []string
+		for _, e := range err.(validator.ValidationErrors) {
+			field := e.Field()
+			switch field {
+			case "Name":
+				validationErrors = append(validationErrors, "Nama gudang wajib diisi.")
+			default:
+				validationErrors = append(validationErrors, field+" tidak valid")
+			}
+		}
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status": "error",
+			"message": "Validasi Gagal!",
+			"errors": validationErrors,
+		})
+		return
+	}
+	
+	//simpan ke DB
+	if err := h.service.Create(&warehouse); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
