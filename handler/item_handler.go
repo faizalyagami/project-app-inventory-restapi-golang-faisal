@@ -86,7 +86,9 @@ func (h *ItemHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": "success",
 		"message": "Item berhasil ditambahkan",
+		"data": item,
 	})
 }
 
@@ -109,9 +111,11 @@ func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"message": "Item barhasil diperbaharui",
+		"status" : "success",
+		"message": "Item berhasil diperbaharui",
+		"data": item,
 	})
 }
 

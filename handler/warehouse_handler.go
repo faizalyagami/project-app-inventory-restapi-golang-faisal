@@ -82,11 +82,14 @@ func (h *WarehouseHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": "success",
 		"message": "Warehouse berhasil ditambah!",
+		"data": warehouse,
 	})
 }
+
 func (h *WarehouseHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	var warehouse model.Warehouse

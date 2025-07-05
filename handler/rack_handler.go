@@ -86,7 +86,9 @@ func (h *RackHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": "success",
 		"message": "rack berhasil ditambahkan!",
+		"data": rack,
 	})
 }
 func (h *RackHandler) Update(w http.ResponseWriter, r *http.Request) {

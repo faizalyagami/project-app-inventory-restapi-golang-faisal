@@ -82,9 +82,11 @@ func (h *CategoryHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": "success",
 		"message": "category berhasil ditambahkan!",
+		"data": category,
 	})
 }
 
