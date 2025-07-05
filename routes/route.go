@@ -30,6 +30,10 @@ func SetUpRouter() http.Handler  {
 	warehouseRepo := repository.NewWarehouseRepository(db)
 	warehouseService := service.NewWarehouseService(warehouseRepo)
 	warehouseHandler := handler.NewWarehouseHandler(warehouseService)
+
+	rackRepo := repository.NewRackRepository(db)
+	rackService := service.NewRackService(rackRepo)
+	rackHandler := handler.NewRackHandler(rackService)
 	
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("pong"))
@@ -57,6 +61,14 @@ func SetUpRouter() http.Handler  {
 		r.Post("/", warehouseHandler.Create)
 		r.Put("/{id}", warehouseHandler.Update)
 		r.Delete("/{id}", warehouseHandler.Delete)
+	})
+
+	r.Route("/racks", func(r chi.Router) {
+		r.Get("/", rackHandler.GetAll)
+		r.Get("/{id}", rackHandler.GetByID)
+		r.Post("/", rackHandler.Create)
+		r.Put("/{id}", rackHandler.Update)
+		r.Delete("/{id}", rackHandler.Delete)
 	})
 	return  r
 }
