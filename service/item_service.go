@@ -11,6 +11,7 @@ type ItemService interface {
   Create(item *model.Item) error
   Update(item *model.Item) error
   Delete(id int64) error
+  GetLowStockItems(threshold int64) ([]model.Item, error)
 }
 
 type itemService struct {
@@ -39,4 +40,8 @@ func (s *itemService) Update(item *model.Item) error {
 
 func (s *itemService) Delete(id int64) error {
 	return s.repo.Delete(id)
+}
+
+func (s *itemService) GetLowStockItems(thresold int64) ([]model.Item,error) {
+	return s.repo.GetLowStockItems(thresold)
 }

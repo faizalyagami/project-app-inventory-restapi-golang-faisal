@@ -12,6 +12,7 @@ type ItemRepository interface {
   Create(item *model.Item) error
   Update(item *model.Item) error
   Delete(id int64) error
+  GetLowStockItems(threshold int64) ([]model.Item, error)
 }
 
 type itemRepository struct {
@@ -65,4 +66,22 @@ func (r *itemRepository) Update(item *model.Item) error {
 func (r *itemRepository) Delete(id int64) error {
 	_, err := r.db.Exec(`DELETE FROM items WHERE id=$1`, id)
 	return err
+}
+
+func (r *itemRepository) GetLowStockItems(thresold int64) ([]model.Item, error) {
+	rows, err := r.db.Query(`SELECT id, name, category_id, rack_id, warehouse_id, stock, price FROM items WHERE stock < $1`, thresold)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []model.Item
+	for rows.Next(){
+		var item model.Item
+		if err := rows.Scan(&item.ID, &item.Name, &item.CategoryID, &item.RackID, &item.WarehouseID, &item.Stock, &item.Price); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	return items, nil
 }

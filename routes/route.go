@@ -64,6 +64,7 @@ func SetUpRouter() http.Handler  {
 		r.Post("/", ItemHandler.Create)
 		r.Put("/{id}", ItemHandler.Update)
 		r.Delete("/{id}", ItemHandler.Delete)
+		r.Get("/low-stock", ItemHandler.GetLowStockItems)
 	})
 
 	r.Route("/categories", func(r chi.Router) {

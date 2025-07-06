@@ -130,3 +130,13 @@ func (h *ItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		"message": "Item berhasil dihapus",
 	})
 }
+
+func (h *ItemHandler) GetLowStockItems(w http.ResponseWriter, r *http.Request) {
+	thresold := int64(5)
+	items, err := h.service.GetLowStockItems(thresold)
+	if err != nil {
+		http.Error(w, "gagal mengambil data stock minimum", http.StatusInternalServerError)
+		return
+	}
+	json.NewEncoder(w).Encode(items)
+}
