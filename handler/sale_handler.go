@@ -73,3 +73,16 @@ func (h *SaleHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 	json.NewEncoder(w).Encode(sale)
 }
+
+func (h *SaleHandler) GetSalesReport(w http.ResponseWriter, r *http.Request) {
+	report, err := h.service.GetSalesReport()
+	if err != nil {
+		http.Error(w, "failed to get sales report", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"message": "Laporan penjualan berhasil diambil",
+		"data": report,
+	})
+}

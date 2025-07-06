@@ -10,6 +10,7 @@ type SaleService interface {
 	CreateSale(sale *model.Sale, items []model.SaleItem) error
 	GetAll() ([]model.Sale, error)
 	GetByID(id int64) (*model.Sale, error)
+	GetSalesReport() (*model.SalesReport, error)
 }
 
 type saleService struct {
@@ -43,4 +44,8 @@ func (s *saleService) GetAll() ([]model.Sale, error) {
 
 func (s *saleService) GetByID(id int64) (*model.Sale, error) {
 	return s.repo.GetByID(id)
+}
+
+func (s *saleService) GetSalesReport() (*model.SalesReport, error) {
+	return s.repo.GetSalesReport()
 }

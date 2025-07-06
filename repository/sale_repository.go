@@ -9,6 +9,7 @@ type SaleRepository interface {
 	CreateSale(sale *model.Sale, items []model.SaleItem) error
 	GetAll() ([]model.Sale, error)
 	GetByID(id int64) (*model.Sale, error)
+	GetSalesReport() (*model.SalesReport, error)
 }
 
 type saleRepository struct {
@@ -87,4 +88,26 @@ func (r *saleRepository) GetByID(id int64) (*model.Sale, error) {
 		return nil, err
 	}
 	return &s, nil
+}
+
+func (r *saleRepository) GetSalesReport() (*model.SalesReport, error) {
+	query := `
+		SELECT 
+			COUNT(DISTINCT s.id) total_transactions,
+			COALESCE(SUM(si.quantity), 0) AS total_items_sold,
+			COALESCE(SUM(si.quantity * i.price), 0) AS total_revenue
+		FROM sales s
+		JOIN sale_items si ON s.id = si.sale_id
+		JOIN items i ON si.item_id = i.id;
+		`
+	var report model.SalesReport
+	err := r.db.QueryRow(query).Scan(
+		&report.TotalTransactions,
+		&report.TotalItemsSold,
+		&report.TotalRevenue,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &report, nil
 }

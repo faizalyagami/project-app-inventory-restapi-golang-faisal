@@ -45,6 +45,10 @@ func SetUpRouter() http.Handler  {
 	saleService := service.NewSaleServer(saleRepo)
 	saleHandler := handler.NewSaleHandler(saleService)
 
+	userRepository := repository.NewUserRepository(db)
+	userService := service.NewUserService(userRepository)
+	userHandler := handler.NewUserHandler(userService)
+
 	r.Use(middleware.LoadUser(userRepo))
 	
 	r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
@@ -63,6 +67,7 @@ func SetUpRouter() http.Handler  {
 	})
 
 	r.Route("/categories", func(r chi.Router) {
+		r.Use(middleware.RoleMiddleware("admin", "staff"))
 		r.Get("/", categoryHandler.GetAll)
 		r.Get("/", categoryHandler.GetByID)
 		r.Post("/", categoryHandler.Create)
@@ -71,6 +76,7 @@ func SetUpRouter() http.Handler  {
 	})
 
 	r.Route("/warehouses", func(r chi.Router) {
+		r.Use(middleware.RoleMiddleware("admin", "staff"))
 		r.Get("/", warehouseHandler.GetAll)
 		r.Get("/{id}", warehouseHandler.GetByID)
 		r.Post("/", warehouseHandler.Create)
@@ -79,6 +85,7 @@ func SetUpRouter() http.Handler  {
 	})
 
 	r.Route("/racks", func(r chi.Router) {
+		r.Use(middleware.RoleMiddleware("admin", "staff"))
 		r.Get("/", rackHandler.GetAll)
 		r.Get("/{id}", rackHandler.GetByID)
 		r.Post("/", rackHandler.Create)
@@ -92,9 +99,24 @@ func SetUpRouter() http.Handler  {
 	})
 
 	r.Route("/sales", func(r chi.Router) {
+		r.Use(middleware.RoleMiddleware("admin", "staff"))
 		r.Post("/", saleHandler.Create)
 		r.Get("/", saleHandler.GetAll)
-		r.Post("/{id}", saleHandler.GetByID)
+		r.Get("/{id}", saleHandler.GetByID)
+		
+		r.Route("/report", func(r chi.Router) {
+			r.Use(middleware.RoleMiddleware("admin", "staff", "owner"))
+			r.Get("/", saleHandler.GetSalesReport)
+		})
 	})
+
+	r.Route("/users", func(r chi.Router) {
+		r.Use(middleware.RoleMiddleware("admin"))
+		r.Get("/", userHandler.GetAll)
+		r.Post("/", userHandler.Create)
+		r.Put("/{id}", userHandler.Update)
+		r.Delete("/{id}", userHandler.Delete)
+	})
+
 	return  r
 }
