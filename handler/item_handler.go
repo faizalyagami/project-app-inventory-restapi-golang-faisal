@@ -22,12 +22,28 @@ func NewItemHandler(s service.ItemService) *ItemHandler {
 }
 
 func (h *ItemHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	items, err := h.service.GetAll()
+	//pagination
+	page ,_ := strconv.Atoi(r.URL.Query().Get("page"))
+	limit ,_ := strconv.Atoi(r.URL.Query().Get("limit"))
+
+	if page <= 0 {
+		page = 1
+	}
+
+	if limit <=0 {
+		limit = 10
+	}
+
+	items, err := h.service.GetPaginated(page, limit)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	json.NewEncoder(w).Encode(items)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"page": page,
+		"limit": limit,
+		"data": items,
+	})
 }
 
 func (h *ItemHandler) GetByID(w http.ResponseWriter, r *http.Request) {

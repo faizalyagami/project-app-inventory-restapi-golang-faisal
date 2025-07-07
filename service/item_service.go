@@ -12,6 +12,7 @@ type ItemService interface {
   Update(item *model.Item) error
   Delete(id int64) error
   GetLowStockItems(threshold int64) ([]model.Item, error)
+  GetPaginated(page, limit int) ([]model.Item, error)
 }
 
 type itemService struct {
@@ -44,4 +45,9 @@ func (s *itemService) Delete(id int64) error {
 
 func (s *itemService) GetLowStockItems(thresold int64) ([]model.Item,error) {
 	return s.repo.GetLowStockItems(thresold)
+}
+
+func (s *itemService) GetPaginated(page, limit int) ([]model.Item, error) {
+	offset := (page - 1) *limit
+	return s.repo.GetPaginated(offset, limit)
 }

@@ -13,6 +13,7 @@ type ItemRepository interface {
   Update(item *model.Item) error
   Delete(id int64) error
   GetLowStockItems(threshold int64) ([]model.Item, error)
+  GetPaginated(offset, limit int) ([]model.Item, error)
 }
 
 type itemRepository struct {
@@ -82,6 +83,28 @@ func (r *itemRepository) GetLowStockItems(thresold int64) ([]model.Item, error) 
 			return nil, err
 		}
 		items = append(items, item)
+	}
+	return items, nil
+}
+
+func (r *itemRepository) GetPaginated(offset, limit int) ([]model.Item, error) {
+	rows, err := r.db.Query(`
+		SELECT id, name, category_id, rack_id, warehouse_id, stock, price
+		FROM items
+		ORDER BY id
+		LIMIT $1 OFFSET $2`, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []model.Item
+	for rows.Next(){
+		var i model.Item
+		if err := rows.Scan(&i.ID, &i.Name, &i.CategoryID, &i.RackID, &i.WarehouseID, &i.Stock, &i.Price); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
 	}
 	return items, nil
 }
